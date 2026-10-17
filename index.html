@@ -184,7 +184,7 @@
       <h1 class="brand">🪔 Golu Quiz</h1>
       <span class="counter" id="counter" aria-live="polite"></span>
     </div>
-    <p class="note"><b>Step 0 is the floor</b>, step 1 is the one above that, and so on up.</p>
+    <p class="note"><b>The floor is not a step.</b> Step 1 is the first one above it, and so on up to step 7.</p>
     <div class="progress" aria-hidden="true"><i id="bar-fill"></i></div>
   </div>
 </header>
@@ -195,9 +195,9 @@
 (() => {
   'use strict';
 
-  // The highest step number on the golu. Steps run from 0 (floor) up to STEP_COUNT.
+  // The highest step number on the golu. Steps run from 1 (the first step above the floor) up to STEP_COUNT.
   // If your golu has more steps, raise this number and the quiz adapts.
-  const STEP_COUNT = 6;
+  const STEP_COUNT = 7;
 
   const QUESTIONS = [
     // General questions
@@ -258,7 +258,7 @@
   let locked = false;
   let screen = 'start';
 
-  const stepName = (n) => (n === 0 ? 'Step 0 (the floor)' : 'Step ' + n);
+  const stepName = (n) => ('Step ' + n);
   const answerText = (q) => (q.type === 'step' ? stepName(q.answer) : q.options[q.answer]);
   const pickText = (q, v) => (q.type === 'step' ? stepName(v) : q.options[v]);
 
@@ -293,7 +293,7 @@
     rough: [
       'Time for another look. The dolls saw everything.',
       'Did you even look at the steps?',
-      'Step 0 is the floor. Your score is not far above it.',
+      'Step 1 is the bottom step. Your score is not far above it.',
       'Even the polar bear looked away.',
       'Go ask for sundal and then look again.',
       'The penguins nested better than you studied.'
@@ -355,9 +355,9 @@
     let opts;
     if (isStep) {
       opts = [];
-      for (let n = STEP_COUNT; n >= 0; n--) {
-        const w = 56 + (44 * (STEP_COUNT - n)) / STEP_COUNT; // narrow at the top, full width at the floor
-        opts.push({ value: n, label: n === 0 ? 'Step 0 · Floor' : 'Step ' + n, width: w.toFixed(1) + '%' });
+      for (let n = STEP_COUNT; n >= 1; n--) {
+        const w = 56 + (44 * (STEP_COUNT - n)) / (STEP_COUNT - 1); // narrow at the top, full width at the bottom
+        opts.push({ value: n, label: 'Step ' + n, width: w.toFixed(1) + '%' });
       }
     } else {
       opts = q.options.map((t, k) => ({ value: k, label: t }));
@@ -457,14 +457,14 @@
   }
 
   // Keyboard on laptop: press a number to answer.
-  // Step questions use the step number itself (0 to STEP_COUNT); general ones use 1, 2, 3...
+  // Step questions use the step number itself (1 to STEP_COUNT); general ones use 1, 2, 3...
   document.addEventListener('keydown', (e) => {
     if (screen !== 'question' || locked || e.metaKey || e.ctrlKey || e.altKey) return;
     if (!/^[0-9]$/.test(e.key)) return;
     const d = Number(e.key);
     const q = QUESTIONS[i];
     if (q.type === 'step') {
-      if (d <= STEP_COUNT) answer(d);
+      if (d >= 1 && d <= STEP_COUNT) answer(d);
     } else if (d >= 1 && d <= q.options.length) {
       answer(d - 1);
     }
